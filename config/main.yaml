@@ -1,0 +1,90 @@
+defaults:
+  - env: building_block
+  - gflownet: trajectorybalance
+  - policy: building_block
+  - proxy: EGFR # The provided resources include four QSAR models designed for the targets EGFR, FGFR1, SRC, and VEGFR2, along with a universal molecular docking and scoring utility, unidock.
+  - logger: wandb
+  - user: user_name
+
+#SpaceGFN implements two distinct policy network output schemes—discrete index-based and fingerprint embedding-based—as described in the Methods section of our accompanying publication.
+
+# Empirically, the discrete formulation is more effective for small building block libraries, while the fingerprint embedding approach exhibits superior scalability on large libraries (e.g., >100k building blocks).
+
+policy_output_1_fixed: False
+policy_output_2_fixed: False
+# bb_nbits: 1024 #Used only when policy_output_2_fixed is set to True. Specifies the Morgan fingerprint dimension for building block representation.
+
+gflownet:
+  optimizer:
+    lr: 1e-4
+    lr_z_mult: 1e-3
+    z_dim: 16
+    batch_size:
+     forward: 64
+    n_train_steps: 5000
+  temperature_logits: 1.5
+  random_action_prob: 0.05
+ 
+policy:
+  policy_1:
+   forward:
+     n_hid: 128
+     n_layers: 2
+     
+  policy_2:
+   forward:
+     n_hid: 256
+     n_layers: 2
+
+#discovery mode - e.g., Synthetic Space
+# mode: "discovery" 
+# smiles_list_dir: "dataprocess/final/discovery/Synthetic/smiles_list.json.gz"
+# mask_dict_dir: "dataprocess/final/discovery/Synthetic/mask_dict.json.gz"
+# run_dir: ${user.logdir.root}/Synthetic/${now:%Y-%m-%d_%H-%M-%S}
+
+# Molecular optimization requires higher proxy accuracy; use general tools (e.g., UniDock) instead of QSAR models.
+
+# #editing mode
+
+# mode: "editing"
+# smiles_list_dir: "dataprocess/final/editing/smiles_list.json.gz"
+# mask_dict_dir: "dataprocess/final/editing/mask_dict.json.gz"
+# pdb_id: "1ynd" 
+# initial_smiles_list_dir: "data/initial/{pdb_id}/{pdb_id}_ligand.json.gz"
+# run_dir: ${user.logdir.root}/Editing/${pdb_id}/${now:%Y-%m-%d_%H-%M-%S}
+
+# proxy:
+#   _target_: gflownet.proxy.unidock.unidock
+#   objectives: null
+#   dict_path: data/target/${pdb_id}/   
+#   protein_path: data/target/${pdb_id}/${pdb_id}_protein.pdb
+#   center: null
+#   ref_ligand_path: data/target/${pdb_id}/${pdb_id}_ligand.sdf
+#   size: [22.5, 22.5, 22.5]
+#   log_dir: ${run_dir}
+
+env:
+  reward_beta: 4 #1
+  buffer:
+    replay_capacity: 1000
+  reaction_step: 2
+  
+logger:
+  checkpoints:
+     period: 100
+
+# Device
+device: "cuda" # cuda or cpu
+# Float precision
+float_precision: 32
+# Number of objects to sample at the end of training
+n_samples: 10000
+# Random seeds
+seed: 42
+
+# Hydra config
+hydra:
+  run:
+    dir: ${run_dir}
+  job:
+    chdir: True
