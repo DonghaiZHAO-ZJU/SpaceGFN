@@ -58,3 +58,31 @@ bash train.sh
 - `gflownet/gflownet.py`: Implementation of the `GFlowNetAgent`.
 - `config/main.yaml`: Central configuration for the entire framework.
 - `install_dependencies.sh`: Critical for setting up the complex CUDA-enabled environment.
+
+## Collaboration & Syncing
+If you are working on a Fork, follow these steps to keep your repository up to date with the original SpaceGFN project.
+
+### 1. Setup Remotes
+Ensure you have the original repository configured as `upstream`:
+```bash
+git remote add upstream https://github.com/ChemloverYuchen/SpaceGFN.git
+```
+
+### 2. Syncing Updates
+To pull the latest changes from the original repository and merge them into your local `main` branch:
+```bash
+# Fetch changes from upstream
+git fetch upstream
+
+# Merge upstream/main into your local main
+git checkout main
+git merge upstream/main
+
+# Push the updates to your personal Fork (origin)
+git push origin main
+```
+
+### 3. Contributing
+To contribute your changes back to the project:
+1. Push your changes to your fork: `git push origin <your-branch>`.
+2. Go to your repository on GitHub and click **"Open Pull Request"**.
