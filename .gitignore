@@ -20,3 +20,4 @@ external/
 !docs/requirements-docs.txt
 .DS_Store
 docs/_build/
+GEMINI.md
